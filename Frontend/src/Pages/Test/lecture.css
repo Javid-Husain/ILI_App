@@ -1,0 +1,16 @@
+.page-content-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.page-content-table th,
+.page-content-table td {
+    padding: 20px;
+    border: 2px solid black; /* Set border to 2px solid black */
+}
+
+.page-content-table h3 {
+    margin-top: 0;
+    font-weight: bold; /* Set font-weight to bold for table headings */
+    color: black; /* Set color to black for table headings */
+}

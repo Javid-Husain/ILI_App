@@ -1,0 +1,92 @@
+  const pageContent = [
+    <div>
+      Introduction to Financial Literacy
+      <br />
+      1. Understanding Basic Financial Concepts Definitions: Money: Money is a
+      recognised medium of exchange in the economy. It is an asset that can be
+      stored and used in the form of currency or as value. Currency: Currency is
+      the physical form of money in the form of coins and rupees. Each country
+      typically has its own currency as a medium of exchange issued by the
+      central bank. In India, the Government of India (GoI) and Reserve Bank of
+      India (RBI) are the issuers of the currency, i.e. Indian Rupees Bank: A
+      bank is a government-authorised financial institution which acts as a
+      custodian of money deposited by account holders and uses the collected
+      funds to extend loans to individuals and businesses while charging
+      interest on the same. Account: An account is a repository of the funds
+      held by a bank on behalf of the account holder. An account can be of
+      various kinds, and is identified by a unique account number issued to the
+      account holder. Saving: Savings is the amount of money that is remaining
+      from income, after the expenses are made. Investment: An investment refers
+      to an asset acquired with the objective of generating income or
+      appreciation. Paragraph: When you accompany your parents to the market, do
+      you observe how they purchase the various items? Every purchase requires
+      the use of money. As you are able to observe, money is the accepted medium
+      of exchange. It allows you to buy the things you require, right from basic
+      things such as bread to high-value products such as a car. In our country,
+      money is used in the form of Indian currency known as ‘Rupee’. You would
+      surely have used ‘rupees’ when you buy food from the school canteen.
+    </div>,
+    <div>
+      2. Barter System Historically speaking, humans have been transacting in
+      goods much before money was invented. Have you ever wondered how these
+      transactions took place? The answer is ‘Barter System’. To understand the
+      Barter System in a simple manner, consider this example: Satya has two
+      bags of wheat at his home; however, he needs only one of them for his
+      monthly consumption. On the other hand, Ahmad has two bags of rice out of
+      which he is able to spare one. So they meet and decide to exchange the bag
+      of wheat with that of rice. After the barter exchange, Satya and Ahmad
+      both have one bag of rice and wheat each to match their requirement of
+      food. Have you ever performed a simple barter exchange with your friend or
+      cousin? For example, you have a pack of sketch pens that you do not need,
+      and you exchange the same for a geometry box?
+    </div>,
+    <div>
+      3. Needs and Wants To better understand the Barter System, it is important
+      to know the meaning of ‘Needs’ and ‘Wants’. In the Satya-Ahmad example, we
+      can see that while Satya needs rice to meet the food requirements of his
+      family, Ahmad needs a bag of wheat for the same purpose. However, rice and
+      wheat are not their ‘wants’. Let us try to understand the same through
+      another example. When you feel hungry, you need food to satisfy your
+      hunger. Therefore, food is your need. However, when you visit the market
+      with your father and you feel tempted to have ice cream. In this
+      situation, ice cream is not your ‘need.’ However, it is your ‘want.’
+      ‘Needs’ are the essential requirements in our life such as food, clothes
+      and house. On the other hand, ‘Wants’ are for the things you require to
+      enhance the quality of your life, such as games, music and TVs.
+    </div>,
+    <div>
+      4. Evolution of Trade Let us start by understanding the definition of
+      trade. Trade is a financial activity that includes buying and selling
+      various goods and services between two or more people involved in the
+      transaction. Trade can happen between organisations and countries as well.
+      For example, India primarily exports products such as rice and jewellery,
+      and imports petroleum and electronic components. The evolution of trade
+      across the world has been closely linked with the development of the money
+      system. You would be surprised to know that trade across continents has
+      been prevalent in our world, even in ancient times. While ancient trade
+      was based on the barter system, there is also evidence of commodities
+      being used in the form of livestock, salt, metal, rare stones et cetera.
+      Pottery traditions were popular in parts of the world such as Japan,
+      Korea, China, Mexico and many more. The Han Dynasty, which ruled China
+      from 206 BC to 220 AD, opened up the ‘Silk Road’ trading route between
+      China and Central Asia. Various kinds of merchandise travelled along the
+      Silk Road, making it one of the oldest routes of international trade in
+      the world. The first non-stop voyages from Egypt to India were initiated
+      at the start of the Common Era. Spices from India came in demand around
+      the world and were the main exports to the western world. The spice trade
+      led to new diplomatic relationships between East and West. It was partly
+      with the spice trade in mind that Christopher set out in 1492 and
+      discovered America.
+    </div>,
+    <div>
+      Summary
+      <br />• Money is a recognised medium of exchange in the economy. • A bank
+      is a government-authorised financial institution which acts as a custodian
+      of money deposited by account holders • Historically speaking, humans have
+      been transacting in goods much before money was invented • While ancient
+      trade was based on the barter system, there is also evidence of
+      commodities being used in the form of livestock, salt, metal, rare stones
+      et cetera. • The Han Dynasty, which ruled China from 206 BC to 220 AD,
+      opened up the ‘Silk Road’ trading route between China and Central Asia.
+    </div>,
+  ];
