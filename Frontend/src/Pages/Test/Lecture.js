@@ -5,6 +5,8 @@ import "./lecture.css"; // Import CSS file
 
 export default function Lecture({ onCompletion }) {
   const [lectureStarted, setLectureStarted] = useState(false);
+  // const [speed, setSpeed] = useState(1); // Default speed set to 1x
+
   const [currentPage, setCurrentPage] = useState(0);
   const [audioTimer, setAudioTimer] = useState(0);
   const [totalTimer, setTotalTimer] = useState(0);
@@ -14,6 +16,7 @@ export default function Lecture({ onCompletion }) {
   const dispatch = useDispatch();
   const speechSynthesisRef = useRef(window.speechSynthesis);
   const playButtonRef = useRef(null);
+  const audioRef = useRef(null);
   const nextButtonRef = useRef(null);
   const replayButtonRef = useRef(null);
   const endLectureButtonRef = useRef(null);
@@ -47,50 +50,37 @@ export default function Lecture({ onCompletion }) {
   // }, [speechSynthesisRef.current.speaking]);
 
   useEffect(() => {
-    if(mode === "audio"){
-      if(isSpeaking){
-        let interval = setInterval(() => {
-          setPageAudio((prevPageAudio) => {
-            return prevPageAudio.map((curAudio) => {
-              if (curAudio.id !== currentPage) {
-                return curAudio; // Return unchanged if not the current page's audio
-              } else {
-                // Return updated audio with incremented 'val'
-                return {
-                  ...curAudio,
-                  val: curAudio.val + 1000,
-                };
-              }
-            });
-          });
-          setAudioTimer((prev) => prev + 1000);
-          setTotalTimer((prev) => prev + 1000);
-        }, 1000);
-        return () => clearInterval(interval);
-      } 
-    }
-    if(mode === "text"){
-      setIsSpeaking(false);
-      let interval = setInterval(() => {
-        setPageText((prevPageAudio) => {
-          return prevPageAudio.map((curAudio) => {
-            if (curAudio.id !== currentPage) {
-              return curAudio; // Return unchanged if not the current page's audio
-            } else {
-              // Return updated audio with incremented 'val'
-              return {
-                ...curAudio,
-                val: curAudio.val + 1000,
-              };
-            }
-          });
-        });
+    let interval;
+    
+    if (mode === "audio" && isSpeaking) {
+      interval = setInterval(() => {
+        setPageAudio((prevPageAudio) =>
+          prevPageAudio.map((curAudio) =>
+            curAudio.id === currentPage
+              ? { ...curAudio, val: curAudio.val + 1000 }
+              : curAudio
+          )
+        );
+        setAudioTimer((prev) => prev + 1000);
+        setTotalTimer((prev) => prev + 1000);
+      }, 1000);
+    } else if (mode === "text") {
+      interval = setInterval(() => {
+        setPageText((prevPageText) =>
+          prevPageText.map((curText) =>
+            curText.id === currentPage
+              ? { ...curText, val: curText.val + 1000 }
+              : curText
+          )
+        );
         setTextTimer((prev) => prev + 1000);
         setTotalTimer((prev) => prev + 1000);
       }, 1000);
-      return () => clearInterval(interval);
     }
-  }, [mode, isSpeaking]);
+  
+    return () => clearInterval(interval);
+  }, [mode, isSpeaking, currentPage]);
+  
 
   const handleFetchParagraphs = async () => {
     try {
@@ -105,19 +95,19 @@ export default function Lecture({ onCompletion }) {
     }
   };
 
-  const speakText = (text) => {
+  const speakText = async (text, speed) => {
     console.log("inSpeakText");
     if (!isSpeechSynthesisSupported) {
       console.error("SpeechSynthesis API is not supported.");
       return;
     }
 
-    if (speechSynthesisRef.current.speaking) {
+    if (speechSynthesisRef.current.speaking || speechSynthesisRef.current.paused) {
       speechSynthesisRef.current.cancel();
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1; // Set speech properties if needed
+    const utterance = await new SpeechSynthesisUtterance(text);
+    // utterance.rate = speed; // Apply the current speed
     utterance.pitch = 1;
     utterance.volume = 1;
     utterance.onstart = () => {
@@ -130,9 +120,9 @@ export default function Lecture({ onCompletion }) {
     utterance.onpause = () => {
       setIsSpeaking(false);
     }
-    setTimeout(() => {
+   
       speechSynthesisRef.current.speak(utterance);
-    }, 50);
+    
   };
 
   const handlePlayButtonClick = () => {
@@ -156,6 +146,14 @@ export default function Lecture({ onCompletion }) {
       speakText(currentText);
     }
   };
+  // const handleSpeedChange = (newSpeed) => {
+  //   setSpeed(newSpeed);
+  //   if (speechSynthesisRef.current.speaking || speechSynthesisRef.current.paused) {
+  //     speechSynthesisRef.current.cancel(); // Stop the current speech
+  //     speakText(paragraphs[currentPage]?.para, newSpeed); // Restart with new speed
+  //   }
+  // };
+  
 
   const handleReplay = () => {
     if (!isSpeechSynthesisSupported) {
@@ -176,25 +174,49 @@ export default function Lecture({ onCompletion }) {
       if (speechSynthesisRef.current.speaking) {
         speechSynthesisRef.current.cancel();
       }
+    } 
+    if(mode === "text"){
+      speakText(paragraphs[currentPage]?.para);
     }
     setMode(mode === "audio" ? "text" : "audio");
   };
 
   const handleNextPage = () => {
-    console.log("nextPage");
-    if (speechSynthesisRef.current.speaking || speechSynthesisRef.current.paused) {
-      console.log("cancelling");
-      speechSynthesisRef.current.resume();
+    // First, stop the timer for the current paragraph
+    if (mode === "audio" && speechSynthesisRef.current.speaking) {
       speechSynthesisRef.current.cancel();
       setIsSpeaking(false);
     }
-    setCurrentPage((prev) => Math.min(prev + 1, paragraphs.length - 1));
-    speakText(paragraphs[currentPage]?.para);
+  
+    // Move to the next page
+    setCurrentPage((prevPage) => {
+      const nextPage = Math.min(prevPage + 1, paragraphs.length - 1);
+  
+      // Reset or start the timer for the new paragraph
+      if (mode === "text") {
+        setPageText((prevPageText) =>
+          prevPageText.map((curPage) =>
+            curPage.id === nextPage ? { ...curPage, val: 0 } : curPage
+          )
+        );
+      } else if (mode === "audio") {
+        setPageAudio((prevPageAudio) =>
+          prevPageAudio.map((curPage) =>
+            curPage.id === nextPage ? { ...curPage, val: 0 } : curPage
+          )
+        );
+        speakText(paragraphs[nextPage]?.para); // Restart audio for the new paragraph
+      }
+  
+      return nextPage;
+    });
   };
+  
 
   const handlePreviousPage = () => {
     if (speechSynthesisRef.current.speaking) {
       speechSynthesisRef.current.cancel();
+      setIsSpeaking(false);
     }
     setCurrentPage((prev) => Math.max(prev - 1, 0));
   };
@@ -215,19 +237,41 @@ export default function Lecture({ onCompletion }) {
   };
 
   const endLecture = () => {
-    const totalTimeTaken = audioTimer / 1000;
+    const totalTimeTaken = totalTimer / 1000;
+
     dispatch(
       updateLectureInfo(
-        audioTimer / 1000, // audioTime
-        0, // textTime (assuming it's not used in this version)
+        audioTimer / 1000,
+        textTimer / 1000,
         totalTimeTaken,
-        audioPlayEvents
+        audioPlayEvents,
+        pageAudio[0].val / 1000,
+        pageAudio[1].val / 1000,
+        pageAudio[2].val / 1000,
+        pageAudio[3].val / 1000,
+        pageAudio[4].val / 1000,
+        pageText[0].val / 1000,
+        pageText[1].val / 1000,
+        pageText[2].val / 1000,
+        pageText[3].val / 1000,
+        pageText[4].val / 1000
       )
     );
     onCompletion(totalTimeTaken);
     setLectureStarted(false);
     setAudioTimer(0);
-    speechSynthesisRef.current.cancel();
+    setTextTimer(0);
+    setTotalTimer(0);
+
+        // Cancel any ongoing speech synthesis
+        if (speechSynthesisRef.current.speaking || speechSynthesisRef.current.paused) {
+          speechSynthesisRef.current.cancel();
+      }
+  
+      // If you're using an HTML audio element, pause it as well
+      if (audioRef.current) {
+          audioRef.current.pause();
+      }
   };
 
   return (
@@ -267,21 +311,42 @@ export default function Lecture({ onCompletion }) {
                       color: "#000000",
                       fontSize: "16px",
                       cursor: "pointer",
+                      marginRight: "16px"
                     }}
                   >
                     {(!isSpeaking)
                       ? "▶"
                       : "⏸"}
                   </button>
-                  <button
+                  <button className="bg-white text-black py-2 px-4 rounded hover:bg-gray-400 border-[1px] border-black transition duration-300"
                     ref={replayButtonRef}
                     onClick={handleReplay}
                     aria-label="Replay Audio"
                   >
                     Replay
                   </button>
+                  {/* <div className="speed-control mt-2">
+                    <label htmlFor="speedSelect">Speed: </label>
+                    <select
+                    id="speedSelect"
+
+                    onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
+                    defaultValue={1} // Default value set to 1x speed
+                    className="border border-black rounded px-2 py-1"
+                    >
+                    <option onClick={() => handleSpeedChange(0.5)}>0.5x</option>
+                    <option onClick={() => handleSpeedChange(1)}>1x</option>
+                    <option onClick={() => handleSpeedChange(1.5)}>1.5x</option>
+                    <option onClick={() => handleSpeedChange(2)}>2x</option>
+
+                    </select>
+
+                    </div> */}
+                  
                 </div>
+                
                 <div>
+                  
                   <div>
                     {pageAudio.map(
                       (curPage) =>
@@ -390,7 +455,7 @@ export default function Lecture({ onCompletion }) {
             <button
               ref={nextButtonRef}
               onClick={handleNextPage}
-              className="bg-white text-black py-2 px-4 rounded hover:bg-gray-400 border-[1px] border-black transition duration-300"
+              className="bg-white text-black py-2 px-4 rounded hover:bg-gray-400 border-[1px] border-black transition duration-300 mr-5"
             >
               Next
             </button>
